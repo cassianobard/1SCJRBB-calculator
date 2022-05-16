@@ -7,11 +7,13 @@ let operator
 let previousNumber
 
 function updateDisplay(numero) {
-  if (newNumber) {
-    display.textContent = numero
-    newNumber = false
+  if (Number(numero) || Number(display.textContent) || display.textContent.includes(',')) { //evita múltiplos zeros no display
+    if (newNumber) {
+      display.textContent = numero
+      newNumber = false
+    }
+    else display.textContent += numero
   }
-  else display.textContent += numero
 }
 
 const insertNumber = (event) => {
@@ -25,14 +27,14 @@ buttons.forEach((button) => button.addEventListener('click', insertNumber))
 const selectOperator = (event) => {
   newNumber = true
   operator = event.target.textContent
-  previousNumber = display.textContent
+  previousNumber = display.textContent.replace(',', '.')
 }
 
 operators.forEach((operator) => operator.addEventListener('click', selectOperator))
 
 const calculate = () => {
-  const actualNumber = display.textContent
-  const result = eval(`${previousNumber}${operator}${actualNumber}`) //template string, utilizando craze
+  const actualNumber = display.textContent.replace(',', '.')
+  const result = eval(`${previousNumber}${operator}${actualNumber}`).toString().replace('.', ',')
   newNumber = true
   updateDisplay(result)
 }
@@ -41,13 +43,15 @@ const equal = document.querySelector("#igual")
 
 equal.addEventListener('click', calculate)
 
-const clearDisplay = () => (display.textContent = "")
+const clearDisplay = () => {
+  display.textContent = 0
+  newNumber = true
+}
 
 document.querySelector("#limparDisplay").addEventListener("click", clearDisplay)
 
 const clearCalc = () => {
   clearDisplay()
-  newNumber = true
   operator = undefined
   previousNumber = undefined
 }
@@ -65,3 +69,19 @@ const invertSignal = () => {
 }
 
 document.querySelector("#inverter").addEventListener("click", invertSignal)
+
+const decimal = () => {
+  if (newNumber) {
+    display.textContent = '0,'
+    newNumber = false
+  }
+  else {
+    if (!display.textContent.includes(',')) {
+      display.textContent += ','
+    }
+  }
+}
+
+document.querySelector("#decimal").addEventListener("click", decimal)
+
+clearDisplay() //inicia a calculadora com '0' na tela
